@@ -11,6 +11,22 @@ class TaskRepeatedUsageException(OutputParserException):
     message: str
 
     def __init__(self, i18n: I18N, tool: str, tool_input: str, text: str):
+        """
+        Initialize the class instance with the provided parameters.
+
+        Args:
+        i18n (I18N): An instance of the I18N class.
+        tool (str): The tool being used.
+        tool_input (str): The input for the tool.
+        text (str): The text associated with the instance.
+
+        Raises:
+        No specific exceptions are raised within this method.
+
+        Returns:
+        None
+        """
+
         
         self.i18n = i18n
         self.text = text

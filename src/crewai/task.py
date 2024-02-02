@@ -32,6 +32,20 @@ class Task(BaseModel):
     @field_validator("id", mode="before")
     @classmethod
     def _deny_user_set_id(cls, v: Optional[UUID4]) -> None:
+        """
+        Deny the user from setting the ID.
+
+        Args:
+            cls: The class instance.
+            v: The value to be set.
+
+        Raises:
+            PydanticCustomError: If the user tries to set the ID.
+
+        Returns:
+            None
+        """
+
         
         if v:
             raise PydanticCustomError(
@@ -40,16 +54,34 @@ class Task(BaseModel):
 
     @model_validator(mode="after")
     def check_tools(self):
+        """
+        Check and update the tools list.
+
+        This method checks if the current object has any tools. If not, it checks if the agent associated with the object has any tools, and if so, it adds those tools to the current object's tools list.
+
+        Returns:
+            The current object after updating the tools list.
+
+        Raises:
+            No specific exceptions are raised.
+        """
+
 
         if not self.tools and (self.agent and self.agent.tools):
             self.tools.extend(self.agent.tools)
         return self
 
     def execute(self, context: str = None) -> str:
-        """Execute the task.
+        """        Execute the task.
 
-        Returns:
-            Output of the task.
+            Args:
+                context (str, optional): Additional context for the task. Defaults to None.
+
+            Returns:
+                str: Output of the task.
+
+            Raises:
+                Exception: If the task has no agent assigned, it can't be executed directly and should be executed in a Crew using a specific process that supports that, either consensual or hierarchical.
         """
 
         if not self.agent:

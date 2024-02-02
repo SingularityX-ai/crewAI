@@ -15,22 +15,55 @@ class Prompts(BaseModel):
 
     def task_execution_with_memory(self) -> str:
 
-        """Generate a prompt for task execution with memory components."""
+        """
+        Generate a prompt for task execution with memory components.
+
+        Returns:
+            str: A prompt for task execution with memory components.
+
+        Raises:
+            None
+        """
         return self._build_prompt(["role_playing", "tools", "memory", "task"])
 
     def task_execution_without_tools(self) -> str:
 
-        """Generate a prompt for task execution without tools components."""
+        """
+        Generate a prompt for task execution without tools components.
+
+        Returns:
+            str: The prompt for task execution without tools components.
+
+        Raises:
+            None
+
+        """
         return self._build_prompt(["role_playing", "task"])
 
     def task_execution(self) -> str:
 
-        """Generate a standard prompt for task execution."""
+        """
+        Generate a standard prompt for task execution.
+
+        :return: A string representing the prompt for task execution.
+        :raises: None
+        """
         return self._build_prompt(["role_playing", "tools", "task"])
 
     def _build_prompt(self, components: [str]) -> str:
         
-        """Constructs a prompt string from specified components."""
+        """
+        Constructs a prompt string from specified components.
+
+        Args:
+        components (list of str): List of components to construct the prompt string from.
+
+        Returns:
+        str: The constructed prompt string.
+
+        Raises:
+        <Exceptions>: Description of exceptions raised, if any.
+        """
         prompt_parts = [self.i18n.slice(component) for component in components]
         prompt_parts.append(self.SCRATCHPAD_SLICE)
         return PromptTemplate.from_template("".join(prompt_parts))
