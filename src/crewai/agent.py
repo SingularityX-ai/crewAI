@@ -102,6 +102,20 @@ class Agent(BaseModel):
     @field_validator("id", mode="before")
     @classmethod
     def _deny_user_set_id(cls, v: Optional[UUID4]) -> None:
+        """
+        Deny user to set the ID.
+
+        Args:
+            cls: The class instance.
+            v: The value to be set.
+
+        Raises:
+            PydanticCustomError: If the user tries to set the field.
+
+        Returns:
+            None
+        """
+
 
         if v:
             raise PydanticCustomError(
@@ -110,6 +124,18 @@ class Agent(BaseModel):
 
     @model_validator(mode="after")
     def set_private_attrs(self):
+        """
+        Set private attributes.
+
+        This method initializes private attributes such as _logger and _rpm_controller based on the provided parameters.
+
+        Raises:
+            <ExceptionType>: <Description of the exception raised>
+
+        Returns:
+            <ReturnType>: <Description of the return value>
+        """
+
 
         self._logger = Logger(self.verbose)
         if self.max_rpm and not self._rpm_controller:
@@ -120,6 +146,16 @@ class Agent(BaseModel):
 
     @model_validator(mode="after")
     def check_agent_executor(self) -> "Agent":
+        """
+        Check if agent executor is set, and if not, set the cache handler.
+
+        Returns:
+            Agent: The current instance of the Agent class.
+
+        Raises:
+            <Exception Type>: <Description of the exception raised>
+        """
+
 
         if not self.agent_executor:
             self.set_cache_handler(self.cache_handler)
@@ -128,15 +164,18 @@ class Agent(BaseModel):
     def execute_task(
         self, task: str, context: str = None, tools: List[Any] = None
     ) -> str:
-        """Execute a task with the agent.
+        """        Execute a task with the agent.
 
-        Args:
-            task: Task to execute.
-            context: Context to execute the task in.
-            tools: Tools to use for the task.
+            Args:
+                task (str): Task to execute.
+                context (str, optional): Context to execute the task in. Defaults to None.
+                tools (List[Any], optional): Tools to use for the task. Defaults to None.
 
-        Returns:
-            Output of the agent
+            Returns:
+                str: Output of the agent
+
+            Raises:
+                Any exceptions that may occur during the task execution.
         """
 
         if context:
@@ -162,22 +201,51 @@ class Agent(BaseModel):
         return result
 
     def set_cache_handler(self, cache_handler) -> None:
+        """
+        Set the cache handler for the current instance.
+
+        Args:
+            cache_handler: The cache handler to be set.
+
+        Raises:
+            None
+
+        Returns:
+            None
+        """
+
 
         self.cache_handler = cache_handler
         self.tools_handler = ToolsHandler(cache=self.cache_handler)
         self.__create_agent_executor()
 
     def set_rpm_controller(self, rpm_controller) -> None:
+        """
+        Set the RPM controller for the object.
+
+        Args:
+        rpm_controller: The RPM controller to be set.
+
+        Raises:
+        None
+
+        Returns:
+        None
+        """
+
 
         if not self._rpm_controller:
             self._rpm_controller = rpm_controller
             self.__create_agent_executor()
 
     def __create_agent_executor(self) -> CrewAgentExecutor:
-        """Create an agent executor for the agent.
+        """        Create an agent executor for the agent.
 
-        Returns:
-            An instance of the CrewAgentExecutor class.
+            Returns:
+                An instance of the CrewAgentExecutor class.
+
+            Raises:
+                None
         """
 
         agent_args = {
@@ -230,5 +298,18 @@ class Agent(BaseModel):
 
     @staticmethod
     def __tools_names(tools) -> str:
+        """
+        Return a comma-separated string of tool names.
+
+        Args:
+            tools (list): A list of tool objects.
+
+        Returns:
+            str: A comma-separated string of tool names.
+
+        Raises:
+            (if applicable)
+        """
+
         
         return ", ".join([t.name for t in tools])

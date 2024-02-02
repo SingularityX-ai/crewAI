@@ -13,6 +13,14 @@ from crewai.utilities import RPMController
 
 
 def test_agent_creation():
+    """
+    Test the creation of an Agent instance.
+
+    Raises:
+        AssertionError: If the role, goal, or backstory attributes are not set correctly.
+
+    """
+
     agent = Agent(role="test role", goal="test goal", backstory="test backstory")
 
     assert agent.role == "test role"
@@ -22,6 +30,14 @@ def test_agent_creation():
 
 
 def test_agent_default_values():
+    """
+    Test the default values of the Agent class.
+
+    Raises:
+        AssertionError: If any of the default values are not as expected.
+
+    """
+
     agent = Agent(role="test role", goal="test goal", backstory="test backstory")
 
     assert isinstance(agent.llm, OpenAI)
@@ -32,6 +48,16 @@ def test_agent_default_values():
 
 
 def test_custom_llm():
+    """
+    Test the custom LLM (Language Model) configuration for the Agent class.
+
+    This function creates an Agent instance with a custom LLM configuration and asserts its properties.
+
+    Raises:
+        AssertionError: If the LLM is not an instance of OpenAI or if its model_name and temperature properties are not as expected.
+
+    """
+
     agent = Agent(
         role="test role",
         goal="test goal",
@@ -46,6 +72,16 @@ def test_custom_llm():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_without_memory():
+    """
+    Test the Agent class without memory.
+
+    This function creates an Agent instance with memory set to False and another instance with memory set to True.
+    It then executes a task and asserts the results and memory state of the agents.
+
+    Raises:
+        AssertionError: If the test results or memory state assertions fail.
+    """
+
     no_memory_agent = Agent(
         role="test role",
         goal="test goal",
@@ -71,6 +107,17 @@ def test_agent_without_memory():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_execution():
+    """
+    Test the execution of the Agent class.
+
+    This function creates an instance of the Agent class with the specified role, goal, backstory, and delegation settings.
+    It then executes a task and asserts that the output matches the expected result.
+
+    Raises:
+        AssertionError: If the output of the executed task does not match the expected result.
+
+    """
+
     agent = Agent(
         role="test role",
         goal="test goal",
@@ -84,12 +131,37 @@ def test_agent_execution():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_execution_with_tools():
+    """
+    Test the execution of an agent with tools.
+
+    This function tests the execution of an agent with tools. It defines a multiplier tool
+    that multiplies two numbers together. The agent is then created with a specified role,
+    goal, backstory, and tools, and the task "What is 3 times 4" is executed. The expected
+    output is "12".
+
+    Raises:
+        AssertionError: If the output of the executed task does not match the expected output.
+
+    """
+
     @tool
     def multiplier(numbers) -> float:
-        """Useful for when you need to multiply two numbers together.
-        The input to this tool should be a comma separated list of numbers of
-        length two, representing the two numbers you want to multiply together.
-        For example, `1,2` would be the input if you wanted to multiply 1 by 2."""
+        """
+        Useful for when you need to multiply two numbers together.
+
+        Args:
+        numbers (str): A comma separated list of numbers of length two, representing the two numbers you want to multiply together.
+
+        Returns:
+        float: The result of multiplying the two input numbers together.
+
+        Raises:
+        ValueError: If the input format is incorrect or if the input numbers are not valid.
+
+        Example:
+        >>> multiplier("2,3")
+        6
+        """
         a, b = numbers.split(",")
         return int(a) * int(b)
 
@@ -107,12 +179,29 @@ def test_agent_execution_with_tools():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_logging_tool_usage():
+    """    Test the usage of logging tools.
+
+        This function tests the usage of logging tools by creating a multiplier tool and an agent, and then executing a task to check the output and tool usage.
+
+        Raises:
+            AssertionError: If the output or tool usage does not match the expected values.
+
+    """
+
     @tool
     def multiplier(numbers) -> float:
-        """Useful for when you need to multiply two numbers together.
-        The input to this tool should be a comma separated list of numbers of
-        length two, representing the two numbers you want to multiply together.
-        For example, `1,2` would be the input if you wanted to multiply 1 by 2."""
+        """
+        Useful for when you need to multiply two numbers together.
+
+        Args:
+        numbers (str): A comma separated list of numbers of length two, representing the two numbers you want to multiply together.
+
+        Returns:
+        float: The result of multiplying the two input numbers together.
+
+        Raises:
+        ValueError: If the input is not in the correct format (e.g., not a comma separated list of two numbers).
+        """
         a, b = numbers.split(",")
         return int(a) * int(b)
 
@@ -138,12 +227,32 @@ def test_logging_tool_usage():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_cache_hitting():
+    """
+    Test the cache handling functionality of the Agent class.
+
+    This test case checks if the Agent class correctly handles caching of tool results.
+
+    Raises:
+        AssertionError: If the cache handling functionality does not work as expected.
+    """
+
     @tool
     def multiplier(numbers) -> float:
-        """Useful for when you need to multiply two numbers together.
-        The input to this tool should be a comma separated list of numbers of
-        length two and ONLY TWO, representing the two numbers you want to multiply together.
-        For example, `1,2` would be the input if you wanted to multiply 1 by 2."""
+        """        Multiply two numbers together.
+
+            Args:
+                numbers (str): A comma separated list of two numbers to be multiplied.
+
+            Returns:
+                float: The result of multiplying the two input numbers together.
+
+            Raises:
+                ValueError: If the input does not contain exactly two numbers separated by a comma.
+
+            Example:
+                >>> multiplier('2,3')
+                6
+        """
         a, b = numbers.split(",")
         return int(a) * int(b)
 
@@ -179,12 +288,36 @@ def test_cache_hitting():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_execution_with_specific_tools():
+    """
+    Test the execution of an agent with specific tools.
+
+    This function defines a test scenario for executing an agent with specific tools. It creates a multiplier tool
+    using the `@tool` decorator and then creates an agent with specified role, goal, backstory, and delegation settings.
+    The agent is then tasked with a question and the output is checked against the expected result.
+
+    Raises:
+        AssertionError: If the output does not match the expected result.
+
+    """
+
     @tool
     def multiplier(numbers) -> float:
-        """Useful for when you need to multiply two numbers together.
-        The input to this tool should be a comma separated list of numbers of
-        length two, representing the two numbers you want to multiply together.
-        For example, `1,2` would be the input if you wanted to multiply 1 by 2."""
+        """
+        Useful for when you need to multiply two numbers together.
+
+        Args:
+        numbers (str): A comma separated list of numbers of length two, representing the two numbers you want to multiply together.
+
+        Returns:
+        float: The result of multiplying the two input numbers together.
+
+        Raises:
+        ValueError: If the input format is incorrect or if the input numbers are not valid.
+
+        Example:
+        >>> multiplier("2,3")
+        6
+        """
         a, b = numbers.split(",")
         return int(a) * int(b)
 
@@ -201,10 +334,27 @@ def test_agent_execution_with_specific_tools():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_custom_max_iterations():
+    """
+    Test the custom max iterations for the agent.
+
+    This function tests the custom max iterations for the agent by creating a test agent with specific attributes and executing a task using a mocked method.
+
+    Raises:
+        Any exceptions that may occur during the execution of the test.
+
+    """
+
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this
+        tool non-stop.
+
+        :param numbers: Input numbers
+        :type numbers: Any
+        :return: The final answer
+        :rtype: float
+        """
         return 42
 
     agent = Agent(
@@ -227,10 +377,30 @@ def test_agent_custom_max_iterations():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_moved_on_after_max_iterations():
+    """
+    Test that the agent moves on after reaching the maximum iterations.
+
+    This test function checks whether the agent moves on after reaching the maximum iterations.
+
+    Raises:
+        AssertionError: If the agent does not move on after reaching the maximum iterations.
+    """
+
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this
+        tool non-stop.
+
+        Args:
+        - numbers: A list of numbers.
+
+        Returns:
+        - float: The final answer.
+
+        Raises:
+        - This function does not raise any exceptions.
+        """
         return 42
 
     agent = Agent(
@@ -257,10 +427,33 @@ def test_agent_moved_on_after_max_iterations():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_respect_the_max_rpm_set(capsys):
+    """
+    Test if the agent respects the maximum RPM set.
+
+    Args:
+    - capsys: A built-in pytest fixture to capture stdout and stderr.
+
+    Raises:
+    No specific exceptions are raised.
+
+    Returns:
+    No return value.
+    """
+
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this tool non-stop.
+
+        Args:
+        - numbers: A list of numbers for calculation
+
+        Returns:
+        - float: The final answer calculated from the input numbers
+
+        Raises:
+        - This function does not raise any specific exceptions.
+        """
         return 42
 
     agent = Agent(
@@ -290,14 +483,35 @@ def test_agent_respect_the_max_rpm_set(capsys):
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_respect_the_max_rpm_set_over_crew_rpm(capsys):
+    """    Test if the agent respects the maximum RPM set over the crew RPM.
+
+        Args:
+        capsys: A built-in pytest fixture for capturing stdout and stderr.
+
+        Raises:
+        AssertionError: If the expected output does not match the actual output.
+
+    """
+
     from unittest.mock import patch
 
     from langchain.tools import tool
 
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this
+        tool non-stop.
+
+        Args:
+        - numbers: A list of numbers.
+
+        Returns:
+        - float: The final answer.
+
+        Raises:
+        - This function does not raise any exceptions.
+        """
         return 42
 
     agent = Agent(
@@ -327,14 +541,35 @@ def test_agent_respect_the_max_rpm_set_over_crew_rpm(capsys):
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_without_max_rpm_respet_crew_rpm(capsys):
+    """    Test the behavior of an agent when the maximum RPM is not respected by the crew RPM.
+
+        Args:
+        capsys: A built-in pytest fixture for capturing stdout and stderr output.
+
+        Raises:
+        AssertionError: If the expected output does not match the actual output.
+
+    """
+
     from unittest.mock import patch
 
     from langchain.tools import tool
 
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this
+        tool non-stop.
+
+        Args:
+        - numbers: A list of numbers.
+
+        Returns:
+        - float: The final answer.
+
+        Raises:
+        - This function does not raise any exceptions.
+        """
         return 42
 
     agent1 = Agent(

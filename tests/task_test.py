@@ -6,11 +6,26 @@ from crewai.task import Task
 
 
 def test_task_tool_reflect_agent_tools():
+    """
+    Test the reflection of tools in the task agent.
+
+    This function tests the reflection of tools in the task agent by creating a fake tool and an agent, and then assigning the fake tool to the agent's tools. It then creates a task with a description and the agent, and asserts that the task's tools include the fake tool.
+
+    Raises:
+        AssertionError: If the task's tools do not include the fake tool.
+
+    """
+
     from langchain.tools import tool
 
     @tool
     def fake_tool() -> None:
-        "Fake tool"
+        """
+        Fake tool
+
+        Raises:
+            No specific exceptions are raised.
+        """
 
     researcher = Agent(
         role="Researcher",
@@ -29,15 +44,40 @@ def test_task_tool_reflect_agent_tools():
 
 
 def test_task_tool_takes_precedence_ove_agent_tools():
+    """
+    Test that the task tool takes precedence over agent tools.
+
+    This function sets up a test scenario where a task tool is created and assigned to a task. The test then asserts that the task tool takes precedence over the agent tools.
+
+    Raises:
+        AssertionError: If the task tools do not take precedence over the agent tools.
+
+    """
+
     from langchain.tools import tool
 
     @tool
     def fake_tool() -> None:
-        "Fake tool"
+        """
+        Fake tool
+
+        Raises:
+            No exceptions are raised.
+
+        Returns:
+            None
+        """
 
     @tool
     def fake_task_tool() -> None:
-        "Fake tool"
+        """
+        Fake tool
+
+        This function does not raise any exceptions.
+
+        Returns:
+            None
+        """
 
     researcher = Agent(
         role="Researcher",
