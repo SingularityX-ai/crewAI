@@ -158,18 +158,19 @@ class Agent(BaseModel):
     def execute_task(
         self, task: str, context: str = None, tools: List[Any] = None
     ) -> str:
-        """        Execute a task with the agent.
+        """
+        Execute a task with the agent.
 
-            Args:
-                task (str): Task to execute.
-                context (str, optional): Context to execute the task in. Defaults to None.
-                tools (List[Any], optional): Tools to use for the task. Defaults to None.
+        Args:
+            task (str): Task to execute.
+            context (str, optional): Context to execute the task in. Defaults to None.
+            tools (List[Any], optional): Tools to use for the task. Defaults to None.
 
-            Returns:
-                str: Output of the agent
+        Returns:
+            str: Output of the agent
 
-            Raises:
-                Any exceptions that may occur during the task execution.
+        Raises:
+            Any exceptions that may occur during the task execution.
         """
         if context:
             task = self.i18n.slice("task_with_context").format(
