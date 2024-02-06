@@ -102,19 +102,17 @@ class Agent(BaseModel):
     @field_validator("id", mode="before")
     @classmethod
     def _deny_user_set_id(cls, v: Optional[UUID4]) -> None:
-        """
-        Deny user to set the ID.
+        """        Deny user to set the ID.
 
         Args:
             cls: The class instance.
             v: The value to be set.
 
-        Raises:
-            PydanticCustomError: If the user tries to set the field.
-
         Returns:
-            None
-        """
+            : None
+
+        Raises:
+            PydanticCustomError: If the user tries to set the field.        """
         if v:
             raise PydanticCustomError(
                 "may_not_set_field", "This field is not to be set by the user.", {}
@@ -122,17 +120,9 @@ class Agent(BaseModel):
 
     @model_validator(mode="after")
     def set_private_attrs(self):
-        """
-        Set private attributes.
+        """        Set private attributes.
 
-        This method initializes private attributes such as _logger and _rpm_controller based on the provided parameters.
-
-        Raises:
-            <ExceptionType>: <Description of the exception raised>
-
-        Returns:
-            <ReturnType>: <Description of the return value>
-        """
+        This method initializes private attributes such as _logger and _rpm_controller based on the provided parameters.        """
         self._logger = Logger(self.verbose)
         if self.max_rpm and not self._rpm_controller:
             self._rpm_controller = RPMController(
@@ -142,15 +132,10 @@ class Agent(BaseModel):
 
     @model_validator(mode="after")
     def check_agent_executor(self) -> "Agent":
-        """
-        Check if agent executor is set, and if not, set the cache handler.
+        """        Check if agent executor is set, and if not, set the cache handler.
 
         Returns:
-            Agent: The current instance of the Agent class.
-
-        Raises:
-            <Exception Type>: <Description of the exception raised>
-        """
+            Agent: The current instance of the Agent class.        """
         if not self.agent_executor:
             self.set_cache_handler(self.cache_handler)
         return self
@@ -160,17 +145,13 @@ class Agent(BaseModel):
     ) -> str:
         """        Execute a task with the agent.
 
-            Args:
-                task (str): Task to execute.
-                context (str, optional): Context to execute the task in. Defaults to None.
-                tools (List[Any], optional): Tools to use for the task. Defaults to None.
+        Args:
+            task (str): Task to execute.
+            context (str?): Context to execute the task in. Defaults to None.
+            tools (List[Any]?): Tools to use for the task. Defaults to None.
 
-            Returns:
-                str: Output of the agent
-
-            Raises:
-                Any exceptions that may occur during the task execution.
-        """
+        Returns:
+            str: Output of the agent        """
         if context:
             task = self.i18n.slice("task_with_context").format(
                 task=task, context=context
@@ -194,18 +175,13 @@ class Agent(BaseModel):
         return result
 
     def set_cache_handler(self, cache_handler) -> None:
-        """
-        Set the cache handler for the current instance.
+        """        Set the cache handler for the current instance.
 
         Args:
             cache_handler: The cache handler to be set.
 
-        Raises:
-            None
-
         Returns:
-            None
-        """
+            : None        """
         self.cache_handler = cache_handler
         self.tools_handler = ToolsHandler(cache=self.cache_handler)
         self.__create_agent_executor()
