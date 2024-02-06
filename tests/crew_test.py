@@ -34,6 +34,16 @@ writer = Agent(
 
 
 def test_crew_config_conditional_requirement():
+    """
+    Test the conditional requirement for crew configuration.
+
+    This function tests the conditional requirement for crew configuration by checking if the Crew class raises a ValueError when instantiated with a sequential process and a specific configuration.
+
+    Raises:
+        ValueError: If the Crew class instantiation with a sequential process and specific configuration does not raise a ValueError.
+
+    """
+
     with pytest.raises(ValueError):
         Crew(process=Process.sequential)
 
@@ -79,6 +89,16 @@ def test_crew_config_conditional_requirement():
 
 
 def test_crew_config_with_wrong_keys():
+    """
+    Test for crew configuration with wrong keys.
+
+    This function tests the crew configuration with wrong keys by creating JSON strings for no_tasks_config and no_agents_config. It then uses pytest to check if Crew raises a ValueError when provided with incorrect configurations.
+
+    Raises:
+        ValueError: If the crew configuration contains wrong keys.
+
+    """
+
     no_tasks_config = json.dumps(
         {
             "agents": [
@@ -111,6 +131,16 @@ def test_crew_config_with_wrong_keys():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_crew_creation():
+    """
+    Test the creation of a crew with tasks and agents.
+
+    This function creates a crew with a list of tasks and agents, and then kicks off the crew to perform the tasks. It asserts that the output matches the expected result.
+
+    Raises:
+        AssertionError: If the output of crew.kickoff() does not match the expected result.
+
+    """
+
     tasks = [
         Task(
             description="Give me a list of 5 interesting ideas to explore for na article, what makes them unique and interesting.",
@@ -144,6 +174,16 @@ def test_crew_creation():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_crew_with_delegating_agents():
+    """
+    Test the crew with delegating agents.
+
+    This function sets up a test scenario with a crew of agents and tasks, and then asserts the kickoff result.
+
+    Raises:
+        AssertionError: If the crew kickoff result does not match the expected value.
+
+    """
+
     tasks = [
         Task(
             description="Produce and amazing 1 paragraph draft of an article about AI Agents.",
@@ -165,6 +205,21 @@ def test_crew_with_delegating_agents():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_crew_verbose_output(capsys):
+    """
+    Test the verbose output of the Crew class.
+
+    Args:
+    capsys: A built-in pytest fixture for capturing stdout and stderr.
+
+    Raises:
+    AssertionError: If the expected strings are not found in the captured output.
+
+    Example:
+    ```
+    test_crew_verbose_output(capsys)
+    ```
+    """
+
     tasks = [
         Task(description="Research AI advancements.", agent=researcher),
         Task(description="Write about AI in healthcare.", agent=writer),
@@ -200,6 +255,16 @@ def test_crew_verbose_output(capsys):
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_crew_verbose_levels_output(capsys):
+    """
+    Test the verbose levels output of the Crew class.
+
+    Args:
+    capsys: A built-in pytest fixture for capturing stdout and stderr.
+
+    Raises:
+    AssertionError: If the expected strings are not found in the captured output.
+    """
+
     tasks = [Task(description="Write about AI advancements.", agent=researcher)]
 
     crew = Crew(agents=[researcher], tasks=tasks, process=Process.sequential, verbose=1)
@@ -227,16 +292,35 @@ def test_crew_verbose_levels_output(capsys):
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_cache_hitting_between_agents():
+    """    Test cache hitting between agents.
+
+        This function tests the cache hitting between agents by creating a
+        multiplier tool and using it to perform multiplication tasks for different
+        agents. It then checks if the cache is being utilized correctly.
+
+        Raises:
+            AssertionError: If the cache is not being utilized correctly.
+
+    """
+
     from unittest.mock import patch
 
     from langchain.tools import tool
 
     @tool
     def multiplier(numbers) -> float:
-        """Useful for when you need to multiply two numbers together.
-        The input to this tool should be a comma separated list of numbers of
-        length two, representing the two numbers you want to multiply together.
-        For example, `1,2` would be the input if you wanted to multiply 1 by 2."""
+        """
+        Useful for when you need to multiply two numbers together.
+
+        Args:
+        - numbers (str): A comma separated list of numbers of length two, representing the two numbers you want to multiply together.
+
+        Returns:
+        - float: The result of multiplying the two input numbers together.
+
+        Raises:
+        - ValueError: If the input format is incorrect or if the input numbers are not valid integers.
+        """
         a, b = numbers.split(",")
         return int(a) * int(b)
 
@@ -271,14 +355,36 @@ def test_cache_hitting_between_agents():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_api_calls_throttling(capsys):
+    """    Test the throttling of API calls.
+
+        This function tests the throttling of API calls by simulating the usage of a tool to get the final answer without actually giving it. It creates an agent, a task, and a crew to carry out the test, and then uses a mock object to control the RPM (Revolutions Per Minute) and verify that the maximum RPM is reached.
+
+        Args:
+            capsys: A built-in pytest fixture for capturing stdout and stderr.
+
+        Raises:
+            AssertionError: If the maximum RPM is not reached or if the expected message is not found in the captured output.
+
+    """
+
     from unittest.mock import patch
 
     from langchain.tools import tool
 
     @tool
     def get_final_answer(numbers) -> float:
-        """Get the final answer but don't give it yet, just re-use this
-        tool non-stop."""
+        """
+        Get the final answer but don't give it yet, just re-use this tool non-stop.
+
+        Args:
+        - numbers: Input numbers
+
+        Returns:
+        - float: The final answer
+
+        Raises:
+        - None
+        """
         return 42
 
     agent = Agent(

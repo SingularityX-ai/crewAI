@@ -16,6 +16,16 @@ tools = AgentTools(agents=[researcher])
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_delegate_work():
+    """
+    Test the delegate_work function.
+
+    This function tests the delegate_work function from the tools module by providing a specific command and checking if the result matches the expected output.
+
+    Raises:
+        Any exceptions that may be raised during the execution of the delegate_work function.
+
+    """
+
     result = tools.delegate_work(
         command="researcher|share your take on AI Agents|I heard you hate them"
     )
@@ -28,6 +38,16 @@ def test_delegate_work():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_ask_question():
+    """
+    Test the ask_question function.
+
+    This function tests the ask_question function by providing a specific command and checking if the result matches the expected response.
+
+    Raises:
+        AssertionError: If the result of the ask_question function does not match the expected response.
+
+    """
+
     result = tools.ask_question(
         command="researcher|do you hate AI Agents?|I heard you LOVE them"
     )
@@ -39,11 +59,29 @@ def test_ask_question():
 
 
 def test_can_not_self_delegate():
+    """
+    Test that self delegation is not allowed.
+
+    Raises:
+        NotImplementedError: If self delegation is attempted.
+    """
+
     # TODO: Add test for self delegation
     pass
 
 
 def test_delegate_work_with_wrong_input():
+    """
+    Test if the delegate work with wrong input.
+
+    This function tests the behavior of the delegate when provided with wrong input. It calls the `ask_question`
+    function from the `tools` module with a specific command and asserts that the result matches an expected error message.
+
+    Raises:
+        AssertionError: If the result does not match the expected error message.
+
+    """
+
     result = tools.ask_question(command="writer|share your take on AI Agents")
 
     assert (
@@ -53,6 +91,18 @@ def test_delegate_work_with_wrong_input():
 
 
 def test_delegate_work_to_wrong_agent():
+    """
+    Test for delegating work to the wrong agent.
+
+    This function tests the behavior of delegating work to the wrong agent by simulating the process and asserting the expected result.
+
+    Raises:
+        <Exception Type>: <Description of when this exception might be raised>
+
+    Returns:
+        None
+    """
+
     result = tools.ask_question(
         command="writer|share your take on AI Agents|I heard you hate them"
     )
@@ -64,6 +114,18 @@ def test_delegate_work_to_wrong_agent():
 
 
 def test_ask_question_to_wrong_agent():
+    """
+    Test for asking a question to the wrong agent.
+
+    This test checks the behavior of the ask_question function when the command is
+    directed to a wrong agent. It verifies that the function returns an error message
+    indicating that the specified agent is not found.
+
+    Raises:
+        AssertionError: If the result returned by the ask_question function does not match
+        the expected error message.
+    """
+
     result = tools.ask_question(
         command="writer|do you hate AI Agents?|I heard you LOVE them"
     )

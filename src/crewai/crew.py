@@ -63,7 +63,13 @@ class Crew(BaseModel):
     @field_validator("id", mode="before")
     @classmethod
     def _deny_user_set_id(cls, v: Optional[UUID4]) -> None:
-        """Prevent manual setting of the 'id' field by users."""
+        """
+        Prevent manual setting of the 'id' field by users.
+
+        :param cls: The class instance.
+        :param v: The value to be set for the 'id' field.
+        :raises PydanticCustomError: If the 'id' field is attempted to be set by the user.
+        """
 
         if v:
             raise PydanticCustomError(
@@ -73,11 +79,36 @@ class Crew(BaseModel):
     @classmethod
     @field_validator("config", mode="before")
     def check_config_type(cls, v: Union[Json, Dict[str, Any]]):
+        """
+        Check the type of the configuration value and return it as a JSON object.
+
+        Args:
+            cls: The class instance.
+            v: The configuration value, which can be either a JSON object or a dictionary.
+
+        Returns:
+            The configuration value as a JSON object.
+
+        Raises:
+            ValueError: If the input value is not a valid JSON object or dictionary.
+
+        """
+
 
         return json.loads(v) if isinstance(v, Json) else v
 
     @model_validator(mode="after")
     def set_private_attrs(self):
+        """
+        Set private attributes for the object.
+
+        Raises:
+            <Exception Type>: <Description of when this exception might be raised>
+
+        Returns:
+            <Return value and its type, if any>
+        """
+
 
         self._cache_handler = CacheHandler()
         self._logger = Logger(self.verbose)
@@ -86,7 +117,15 @@ class Crew(BaseModel):
 
     @model_validator(mode="after")
     def check_config(self):
-        """Validates that the crew is properly configured with agents and tasks."""
+        """
+        Validates that the crew is properly configured with agents and tasks.
+
+        Raises:
+            PydanticCustomError: If the crew is not properly configured with agents and tasks.
+
+        Returns:
+            self: The current instance of the class after validation.
+        """
 
         if not self.config and not self.tasks and not self.agents:
             raise PydanticCustomError(
@@ -105,7 +144,13 @@ class Crew(BaseModel):
         return self
 
     def _setup_from_config(self):
-        """Initializes agents and tasks from the provided config."""
+        """
+        Initializes agents and tasks from the provided config.
+
+        Raises:
+            PydanticCustomError: If 'agents' or 'tasks' are missing in the config.
+
+        """
 
         if not self.config.get("agents") or not self.config.get("tasks"):
             raise PydanticCustomError(
@@ -116,7 +161,18 @@ class Crew(BaseModel):
         self.tasks = [self._create_task(task) for task in self.config["tasks"]]
 
     def _create_task(self, task_config):
-        """Creates a task instance from its configuration."""
+        """
+        Creates a task instance from its configuration.
+
+        Args:
+        - task_config (dict): Configuration for the task.
+
+        Returns:
+        - Task: Task instance created from the configuration.
+
+        Raises:
+        - StopIteration: If no agent with the specified role is found in the list of agents.
+        """
 
         task_agent = next(
             agt for agt in self.agents if agt.role == task_config["agent"]
@@ -125,7 +181,15 @@ class Crew(BaseModel):
         return Task(**task_config, agent=task_agent)
 
     def kickoff(self) -> str:
-        """Starts the crew to work on its assigned tasks."""
+        """
+        Starts the crew to work on its assigned tasks.
+
+        Raises:
+            <ExceptionType>: Description of the exception raised.
+
+        Returns:
+            str: If the process is sequential, returns the result of the _sequential_loop method.
+        """
 
         for agent in self.agents:
             agent.i18n = I18N(language=self.language)
@@ -134,7 +198,15 @@ class Crew(BaseModel):
             return self._sequential_loop()
 
     def _sequential_loop(self) -> str:
-        """Executes tasks sequentially and returns the final output."""
+        """
+        Executes tasks sequentially and returns the final output.
+
+        Raises:
+            <Exception Type>: <Description of when this exception is raised>
+
+        Returns:
+            str: The final output after executing all tasks sequentially.
+        """
 
         task_output = None
         for task in self.tasks:
@@ -149,7 +221,18 @@ class Crew(BaseModel):
         return task_output
 
     def _prepare_and_execute_task(self, task):
-        """Prepares and logs information about the task being executed."""
+        """
+        Prepares and logs information about the task being executed.
+
+        Args:
+        - task (Task): The task to be executed.
+
+        Raises:
+        - None
+
+        Returns:
+        - None
+        """
         
         if task.agent.allow_delegation:
             task.tools += AgentTools(agents=self.agents).tools()
