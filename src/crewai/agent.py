@@ -115,8 +115,6 @@ class Agent(BaseModel):
         Returns:
             None
         """
-
-
         if v:
             raise PydanticCustomError(
                 "may_not_set_field", "This field is not to be set by the user.", {}
@@ -135,8 +133,6 @@ class Agent(BaseModel):
         Returns:
             <ReturnType>: <Description of the return value>
         """
-
-
         self._logger = Logger(self.verbose)
         if self.max_rpm and not self._rpm_controller:
             self._rpm_controller = RPMController(
@@ -155,8 +151,6 @@ class Agent(BaseModel):
         Raises:
             <Exception Type>: <Description of the exception raised>
         """
-
-
         if not self.agent_executor:
             self.set_cache_handler(self.cache_handler)
         return self
@@ -177,7 +171,6 @@ class Agent(BaseModel):
             Raises:
                 Any exceptions that may occur during the task execution.
         """
-
         if context:
             task = self.i18n.slice("task_with_context").format(
                 task=task, context=context
@@ -213,8 +206,6 @@ class Agent(BaseModel):
         Returns:
             None
         """
-
-
         self.cache_handler = cache_handler
         self.tools_handler = ToolsHandler(cache=self.cache_handler)
         self.__create_agent_executor()
@@ -232,8 +223,6 @@ class Agent(BaseModel):
         Returns:
         None
         """
-
-
         if not self._rpm_controller:
             self._rpm_controller = rpm_controller
             self.__create_agent_executor()
